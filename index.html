@@ -1,0 +1,1167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GameArtSpec — Art Bible & Technical Art Spec Generator for Game Devs (v1.2)</title>
+<meta name="description" content="Generate production-ready art bibles and technical art specs. Unity 2026 render pipeline support (URP/HDRP migration), PBR material reference, channel packing guides. Free. Built by a AAA Technical Artist.">
+<meta name="keywords" content="game art bible, art bible generator, technical art spec, game dev tools, PBR reference, texture spec, indie game development, art direction template, game art pipeline">
+<meta property="og:title" content="GameArtSpec — Free Art Bible & Tech Art Spec Generator">
+<meta property="og:description" content="Auto-generate art bibles, PBR material specs, channel packing guides, and texture validation — tailored to your engine and platform. No signup required.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://jessicaarchive.github.io/gameartspec/">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="GameArtSpec — Free Art Bible Generator for Game Devs">
+<meta name="twitter:description" content="Generate complete art bibles and tech art specs for your game project. PBR values, texture specs, naming conventions — all auto-generated. Free, no signup.">
+<link rel="canonical" href="https://jessicaarchive.github.io/gameartspec/">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0d1117;--card:#161b22;--border:#30363d;--text:#e6edf3;--muted:#8b949e;--accent:#58a6ff;--green:#3fb950;--orange:#d29922;--red:#f85149}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh}
+.container{max-width:900px;margin:0 auto;padding:24px}
+h1{font-size:2rem;margin-bottom:4px}
+.subtitle{color:var(--muted);margin-bottom:32px;font-size:1.1rem}
+.badge{display:inline-block;background:var(--accent);color:#000;padding:2px 10px;border-radius:12px;font-size:0.75rem;font-weight:700;margin-left:8px;vertical-align:middle}
+.form-section{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px;margin-bottom:20px}
+.form-section h2{font-size:1.1rem;margin-bottom:16px;color:var(--accent)}
+label{display:block;font-size:0.85rem;color:var(--muted);margin-bottom:4px;margin-top:12px}
+label:first-child{margin-top:0}
+select,input,textarea{width:100%;padding:10px 12px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:0.95rem;font-family:inherit}
+textarea{resize:vertical;min-height:80px}
+select:focus,input:focus,textarea:focus{outline:none;border-color:var(--accent)}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+button{padding:12px 24px;border:none;border-radius:8px;font-size:1rem;font-weight:600;cursor:pointer;transition:all .2s}
+.btn-primary{background:var(--accent);color:#000;width:100%;margin-top:20px;font-size:1.1rem;padding:14px}
+.btn-primary:hover{opacity:0.9}
+.btn-secondary{background:var(--border);color:var(--text);margin:4px}
+.btn-secondary:hover{background:var(--muted)}
+#output{display:none;margin-top:24px}
+.spec-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px;margin-bottom:16px}
+.spec-card h3{color:var(--green);margin-bottom:12px;font-size:1rem;text-transform:uppercase;letter-spacing:1px}
+table{width:100%;border-collapse:collapse;margin:8px 0}
+th,td{text-align:left;padding:8px 12px;border-bottom:1px solid var(--border);font-size:0.9rem}
+th{color:var(--muted);font-weight:500;font-size:0.8rem;text-transform:uppercase}
+td{color:var(--text)}
+.tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:0.8rem;margin:2px}
+.tag-green{background:#1a3a2a;color:var(--green)}
+.tag-orange{background:#3a2a1a;color:var(--orange)}
+.tag-red{background:#3a1a1a;color:var(--red)}
+.toolbar{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+pre{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:16px;overflow-x:auto;font-size:0.85rem;line-height:1.5;white-space:pre-wrap}
+.naming-example{font-family:monospace;color:var(--accent);background:var(--bg);padding:4px 8px;border-radius:4px;display:inline-block;margin:2px 0}
+.hero{text-align:center;padding:40px 0 20px}
+.hero p{max-width:600px;margin:0 auto}
+.note{background:#1a2332;border-left:3px solid var(--accent);padding:12px 16px;margin:12px 0;border-radius:0 8px 8px 0;font-size:0.9rem;color:var(--muted)}
+.pro-banner{background:linear-gradient(135deg,#1a1a2e,#16213e);border:1px solid var(--accent);border-radius:12px;padding:24px;text-align:center;margin-top:24px}
+.pro-banner h3{color:var(--accent);margin-bottom:8px}
+.email-input{display:flex;gap:8px;max-width:400px;margin:12px auto 0}
+.email-input input{flex:1}
+.email-input button{white-space:nowrap}
+footer{text-align:center;color:var(--muted);padding:40px 0 20px;font-size:0.85rem}
+.checklist{list-style:none;padding:0}
+.checklist li{padding:4px 0;font-size:0.9rem}
+.checklist li::before{content:'✓ ';color:var(--green)}
+.pbr-swatch{display:inline-block;width:14px;height:14px;border-radius:3px;vertical-align:middle;margin-right:6px;border:1px solid var(--border)}
+.recipe-toggle{cursor:pointer;user-select:none;padding:10px 16px;background:var(--bg);border:1px solid var(--border);border-radius:8px;margin:4px 0;display:flex;justify-content:space-between;align-items:center}
+.recipe-toggle:hover{border-color:var(--accent)}
+.recipe-body{display:none;padding:12px 16px;font-size:0.9rem;border-left:2px solid var(--accent);margin:0 0 8px 8px}
+.recipe-body.open{display:block}
+.validator-input{display:flex;gap:8px;margin:12px 0}
+.validator-input input{flex:1}
+.validator-result{padding:10px 16px;border-radius:8px;margin:8px 0;font-size:0.9rem}
+.validator-pass{background:#1a3a2a;border:1px solid var(--green);color:var(--green)}
+.validator-fail{background:#3a1a1a;border:1px solid var(--red);color:var(--red)}
+.validator-warn{background:#3a2a1a;border:1px solid var(--orange);color:var(--orange)}
+.tab-bar{display:flex;gap:4px;margin-bottom:16px;border-bottom:2px solid var(--border);padding-bottom:0}
+.tab-btn{padding:8px 16px;background:none;border:none;color:var(--muted);cursor:pointer;font-size:0.9rem;border-bottom:2px solid transparent;margin-bottom:-2px;font-weight:500}
+.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent)}
+.tab-btn:hover{color:var(--text)}
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+.channel-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:12px 0}
+.channel-box{text-align:center;padding:8px;border-radius:6px;font-size:0.8rem;font-weight:600}
+.ch-r{background:#3a1a1a;color:#ff6b6b}
+.ch-g{background:#1a3a1a;color:#6bff6b}
+.ch-b{background:#1a1a3a;color:#6b6bff}
+.ch-a{background:#2a2a2a;color:#ccc}
+@media(max-width:640px){.row,.row-3{grid-template-columns:1fr}.container{padding:16px}.channel-grid{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+
+<div class="container">
+<div class="hero">
+<h1>🎮 GameArtSpec <span class="badge">FREE</span> <span class="badge" style="background:var(--orange)">v1.2</span></h1>
+<p class="subtitle">Art Bible generator + tech art specs + PBR reference + texture validation.<br>Built by a Technical Artist who's shipped AAA games.</p>
+<div style="background:#1a2332;border:1px solid var(--orange);border-radius:8px;padding:12px 16px;margin-top:12px;font-size:0.85rem;color:var(--orange);text-align:left;max-width:600px;margin-left:auto;margin-right:auto">
+<strong>🔥 v1.2 — Unity 2026 Pipeline Strategy Update:</strong> HDRP is entering maintenance mode. Built-in RP is deprecated. URP becomes the primary pipeline. This tool now includes HDRP → URP migration checklist and updated warnings.
+</div>
+</div>
+
+<!-- INPUT FORM -->
+<div class="form-section">
+<h2>🎯 Project Setup</h2>
+<label>Game Title</label>
+<input type="text" id="gameTitle" placeholder="e.g., Neon Ronin">
+
+<div class="row">
+<div>
+<label>Target Platform</label>
+<select id="platform">
+<option value="mobile">Mobile (iOS/Android)</option>
+<option value="switch">Nintendo Switch</option>
+<option value="pc" selected>PC (Steam)</option>
+<option value="console">Console (PS5/Xbox Series)</option>
+<option value="vr">VR (Quest/PCVR)</option>
+<option value="web">Web (WebGL/WebGPU)</option>
+</select>
+</div>
+<div>
+<label>Engine</label>
+<select id="engine">
+<option value="unity">Unity</option>
+<option value="unreal" selected>Unreal Engine 5</option>
+<option value="godot">Godot 4</option>
+<option value="custom">Custom Engine</option>
+</select>
+</div>
+</div>
+
+<div id="renderPipelineRow" style="display:none;margin-top:12px">
+<div class="row">
+<div>
+<label>Render Pipeline</label>
+<select id="renderPipeline" onchange="updatePipelineWarning()">
+<option value="urp" selected>URP (Universal Render Pipeline)</option>
+<option value="hdrp">HDRP (High Definition)</option>
+<option value="builtin">Built-in (Legacy)</option>
+</select>
+</div>
+<div style="display:flex;align-items:end;padding-bottom:10px;flex-direction:column;gap:4px">
+<label style="display:inline;cursor:pointer;font-size:0.9rem;color:var(--orange)"><input type="checkbox" id="migrating" style="width:auto;margin-right:6px"> Migrating from Built-in RP?</label>
+<label id="migratingHdrpLabel" style="display:none;cursor:pointer;font-size:0.9rem;color:var(--orange)"><input type="checkbox" id="migratingHdrp" style="width:auto;margin-right:6px"> Migrating from HDRP?</label>
+</div>
+</div>
+<div id="pipelineWarning" style="display:none;margin-top:8px;padding:10px 14px;border-radius:8px;font-size:0.85rem"></div>
+</div>
+
+<div class="row">
+<div>
+<label>Art Style</label>
+<select id="artStyle">
+<option value="realistic">Realistic / PBR</option>
+<option value="stylized" selected>Stylized</option>
+<option value="pixel">Pixel Art</option>
+<option value="lowpoly">Low Poly</option>
+<option value="toon">Toon / Cel-Shaded</option>
+<option value="handpainted">Hand-Painted</option>
+</select>
+</div>
+<div>
+<label>Genre</label>
+<select id="genre">
+<option value="rpg">RPG</option>
+<option value="fps">FPS / Shooter</option>
+<option value="platformer" selected>Platformer</option>
+<option value="rts">RTS / Strategy</option>
+<option value="openworld">Open World</option>
+<option value="horror">Horror</option>
+<option value="casual">Casual / Hyper-casual</option>
+</select>
+</div>
+</div>
+
+<div class="row">
+<div>
+<label>Target Poly Budget (per character)</label>
+<select id="polyBudget">
+<option value="low">Low (&lt;5K tris)</option>
+<option value="medium" selected>Medium (5K-30K tris)</option>
+<option value="high">High (30K-100K tris)</option>
+<option value="ultra">Ultra (100K+ / Nanite)</option>
+</select>
+</div>
+<div>
+<label>Team Size</label>
+<select id="teamSize">
+<option value="solo" selected>Solo Dev</option>
+<option value="small">Small (2-5)</option>
+<option value="medium">Medium (6-20)</option>
+<option value="large">Large (20+)</option>
+</select>
+</div>
+</div>
+
+<label>Additional Notes (optional)</label>
+<textarea id="notes" placeholder="e.g., Need support for dynamic day/night cycle, lots of particle effects, targeting 60fps..."></textarea>
+
+<button class="btn-primary" onclick="generateSpec()">⚡ Generate Art Bible & Technical Spec</button>
+</div>
+
+<!-- OUTPUT -->
+<div id="output">
+<div class="toolbar">
+<button class="btn-secondary" onclick="copyMarkdown()">📋 Copy Spec (MD)</button>
+<button class="btn-secondary" onclick="exportArtBible()" style="background:var(--accent);color:#000;font-weight:600">📖 Export Art Bible</button>
+<button class="btn-secondary" onclick="copyJSON()">📦 Copy JSON</button>
+<button class="btn-secondary" onclick="window.print()">🖨️ Print / PDF</button>
+</div>
+<div id="specContent"></div>
+
+<!-- Texture Naming Validator -->
+<div class="spec-card" id="validatorCard" style="display:none">
+<h3>🔍 Texture Naming Validator</h3>
+<p style="color:var(--muted);margin-bottom:8px">Paste a texture filename to check against your project's naming convention.</p>
+<div class="validator-input">
+<input type="text" id="texFilename" placeholder="e.g., T_RockWall_D.png" onkeypress="if(event.key==='Enter')validateFilename()">
+<button class="btn-secondary" onclick="validateFilename()" style="margin:0">Check</button>
+</div>
+<div id="validatorResults"></div>
+</div>
+
+<div class="pro-banner">
+<h3>🚀 GameArtSpec Pro — $19 one-time</h3>
+<p style="color:var(--muted);margin-bottom:12px">Everything in the free tool, plus the stuff that takes weeks to build from scratch:</p>
+<ul style="text-align:left;max-width:480px;margin:0 auto 16px;color:var(--muted);font-size:0.9rem;list-style:none;padding:0">
+  <li style="padding:3px 0">✓ <strong style="color:var(--text)">CI Texture Validator</strong> — Python script + GitHub Actions workflow, catches bad textures before build</li>
+  <li style="padding:3px 0">✓ <strong style="color:var(--text)">Engine Project Configs</strong> — Auto-generated .uproject / ProjectSettings.asset / project.godot with optimal import rules</li>
+  <li style="padding:3px 0">✓ <strong style="color:var(--text)">Art Team Onboarding Doc</strong> — Notion/Confluence-ready, includes PBR reference + naming guide + folder structure</li>
+  <li style="padding:3px 0">✓ <strong style="color:var(--text)">Offline HTML + PDF Export</strong> — Run without internet. Export full spec as formatted PDF</li>
+  <li style="padding:3px 0">✓ <strong style="color:var(--text)">HDRP → URP Migration Kit</strong> — Mask Map conversion scripts + shader remapping guide <span class="badge" style="background:var(--orange);font-size:0.65rem">NEW</span></li>
+</ul>
+<p style="color:var(--accent);font-weight:600;font-size:1.1rem;margin-bottom:8px">🔜 Pro launching soon — join the waitlist</p>
+<div class="email-input">
+<input type="email" id="proEmail" placeholder="your@email.com">
+<button class="btn-secondary" onclick="joinWaitlist()" style="margin:0;background:var(--accent);color:#000;font-weight:600">Join Waitlist</button>
+</div>
+<div id="waitlistMsg" style="display:none;color:var(--green);margin-top:8px;font-size:0.9rem">✓ You're on the list! We'll email you when Pro launches.</div>
+<p style="color:var(--muted);font-size:0.8rem;margin-top:8px">One-time $19. No subscription. Get notified at launch.</p>
+</div>
+</div>
+
+<footer>
+<p>Built by a Technical Artist for Technical Artists. No AI wrapper — real production knowledge baked in.</p>
+<p style="margin-top:4px">v1.2 — Updated for Unity 2026 Pipeline Strategy | © 2026 GameArtSpec</p>
+</footer>
+</div>
+
+<script>
+const SPECS = {
+  textureSizes: {
+    mobile:  { char: '1024', prop: '512', env: '1024', ui: '512', atlas: '2048' },
+    switch:  { char: '1024', prop: '512', env: '1024', ui: '512', atlas: '2048' },
+    pc:      { char: '2048', prop: '1024', env: '2048', ui: '1024', atlas: '4096' },
+    console: { char: '4096', prop: '2048', env: '4096', ui: '2048', atlas: '4096' },
+    vr:      { char: '2048', prop: '1024', env: '2048', ui: '1024', atlas: '4096' },
+    web:     { char: '1024', prop: '512', env: '1024', ui: '512', atlas: '2048' }
+  },
+  formats: {
+    unity:  { diffuse: 'PNG → ASTC/ETC2/BC7', normal: 'PNG → BC5 (Linear)', mask: 'PNG → BC7', ui: 'PNG → ASTC 4x4' },
+    unreal: { diffuse: 'TGA/PNG → BC7/DXT5', normal: 'TGA → BC5 (DirectX)', mask: 'TGA → BC7 (Channel Packed)', ui: 'PNG → BC7' },
+    godot:  { diffuse: 'PNG → BPTC/S3TC', normal: 'PNG → RGTC (Linear)', mask: 'PNG → S3TC', ui: 'PNG → Lossless' },
+    custom: { diffuse: 'PNG/TGA → BC7', normal: 'PNG → BC5', mask: 'PNG → BC7', ui: 'PNG' }
+  },
+  polyBudgets: {
+    mobile:  { low: '1.5K', medium: '5K', high: '15K', ultra: '30K' },
+    switch:  { low: '3K', medium: '10K', high: '25K', ultra: '50K' },
+    pc:      { low: '5K', medium: '20K', high: '60K', ultra: '200K+' },
+    console: { low: '10K', medium: '30K', high: '100K', ultra: 'Nanite (unlimited)' },
+    vr:      { low: '3K', medium: '10K', high: '30K', ultra: '50K' },
+    web:     { low: '1K', medium: '5K', high: '12K', ultra: '25K' }
+  },
+  maps: {
+    realistic:   ['BaseColor', 'Normal', 'Roughness', 'Metallic', 'AO', 'Emissive*', 'Height*'],
+    stylized:    ['BaseColor', 'Normal', 'Mask (R:Rough G:Metal B:AO)', 'Emissive*'],
+    pixel:       ['Diffuse (Nearest filtering)', 'Emissive*'],
+    lowpoly:     ['BaseColor (Flat)', 'Emissive*', 'Gradient Ramp*'],
+    toon:        ['BaseColor', 'Normal', 'Toon Ramp', 'Outline Mask*'],
+    handpainted: ['Diffuse (Baked lighting)', 'Alpha Mask*', 'Emissive*']
+  },
+  naming: {
+    unity:  { prefix: 'T_', mat: 'M_', mesh: 'SM_', skel: 'SK_', anim: 'A_' },
+    unreal: { prefix: 'T_', mat: 'MI_', mesh: 'SM_', skel: 'SK_', anim: 'A_' },
+    godot:  { prefix: 'tex_', mat: 'mat_', mesh: 'mesh_', skel: 'skel_', anim: 'anim_' },
+    custom: { prefix: 'T_', mat: 'M_', mesh: 'SM_', skel: 'SK_', anim: 'A_' }
+  },
+  lods: {
+    mobile:  [100, 50, 25],
+    switch:  [100, 50, 25],
+    pc:      [100, 70, 40, 15],
+    console: [100, 70, 40, 15],
+    vr:      [100, 60, 30],
+    web:     [100, 50, 25]
+  },
+
+  // PBR Material Reference Values (measured from AAA productions)
+  pbrRef: [
+    { name: 'Polished Metal', basecolor: '#C8C8C8', metallic: '1.0', roughness: '0.05-0.15', notes: 'Pure metals are always M=1. Never gray-zone.' },
+    { name: 'Brushed Metal', basecolor: '#B0B0B0', metallic: '1.0', roughness: '0.35-0.55', notes: 'Anisotropic roughness for directional brushing.' },
+    { name: 'Rusted Metal', basecolor: '#8B4513', metallic: '0.0', roughness: '0.75-0.95', notes: 'Rust is a dielectric (M=0). Blend mask between clean metal and rust.' },
+    { name: 'Painted Metal', basecolor: 'Varies', metallic: '0.0', roughness: '0.3-0.6', notes: 'Paint layer is dielectric. Scratches reveal metal (M=1) underneath.' },
+    { name: 'Concrete', basecolor: '#808080', metallic: '0.0', roughness: '0.7-0.95', notes: 'Wet concrete: roughness 0.3-0.5. Use detail normal for surface grain.' },
+    { name: 'Wood (Raw)', basecolor: '#A0724A', metallic: '0.0', roughness: '0.5-0.8', notes: 'End grain vs side grain roughness differs. Use cavity map for grain depth.' },
+    { name: 'Wood (Polished)', basecolor: '#6B4226', metallic: '0.0', roughness: '0.15-0.35', notes: 'Clearcoat layer. Consider dual-lobe BRDF in UE5.' },
+    { name: 'Fabric (Cotton)', basecolor: 'Varies', metallic: '0.0', roughness: '0.8-1.0', notes: 'Use subsurface for thin fabrics. Fuzz shading model in UE5.' },
+    { name: 'Leather', basecolor: '#4A3728', metallic: '0.0', roughness: '0.4-0.7', notes: 'Worn areas = lower roughness. Stitching via normal map detail.' },
+    { name: 'Plastic (Glossy)', basecolor: 'Varies', metallic: '0.0', roughness: '0.1-0.3', notes: 'F0 reflectance ~0.04 (default). Never set metallic > 0 for plastic.' },
+    { name: 'Glass', basecolor: '#FFFFFF', metallic: '0.0', roughness: '0.0-0.05', notes: 'Use translucent shading. Opacity + refraction. Frosted = roughness 0.3+.' },
+    { name: 'Skin (Human)', basecolor: '#D4A574', metallic: '0.0', roughness: '0.35-0.55', notes: 'SSS required. Subsurface radius ~1.0cm. Oily zones = lower roughness.' },
+    { name: 'Stone / Rock', basecolor: '#696969', metallic: '0.0', roughness: '0.6-0.9', notes: 'Wet stone: roughness 0.2-0.4. Macro normal for large-scale shape.' },
+    { name: 'Marble', basecolor: '#E8E0D8', metallic: '0.0', roughness: '0.1-0.3', notes: 'SSS for translucent veins. Polished = near-mirror roughness.' },
+    { name: 'Gold', basecolor: '#FFD700', metallic: '1.0', roughness: '0.1-0.3', notes: 'BaseColor carries the hue for metals. Tarnish = roughness increase.' },
+    { name: 'Copper', basecolor: '#B87333', metallic: '1.0', roughness: '0.15-0.4', notes: 'Patina (green) is dielectric overlay (M=0, BaseColor=#4A8C6F).' },
+    { name: 'Dirt / Soil', basecolor: '#5C4033', metallic: '0.0', roughness: '0.85-1.0', notes: 'Wet dirt: roughness 0.4-0.6. Blend with base material via vertex color.' },
+    { name: 'Water (Surface)', basecolor: '#1A3A4A', metallic: '0.0', roughness: '0.0-0.02', notes: 'Use water shading model. Normal map for ripples at ≥60fps.' },
+    { name: 'Ice / Snow', basecolor: '#E8F0FF', metallic: '0.0', roughness: '0.1-0.4', notes: 'SSS for depth. Packed snow = rougher. Ice = near-specular.' }
+  ],
+
+  // Unity Render Pipeline specific overrides
+  unityRP: {
+    urp: {
+      name: 'Universal Render Pipeline (URP)',
+      shader: 'Universal Render Pipeline/Lit',
+      maskMap: false,
+      diffuse: 'PNG → ASTC/ETC2/BC7',
+      normal: 'PNG → ETC2/BC5 (Linear)',
+      mask: 'PNG → ASTC/BC7 (Smoothness in Alpha)',
+      sss: false,
+      decals: 'URP Decal Renderer Feature',
+      postProcess: 'Volume Framework (URP)',
+      notes: 'URP does not use HDRP Mask Map. Metallic texture + Smoothness via alpha channel. Best for mobile/Switch/WebGL.',
+      shaderTips: [
+        'Use Shader Graph for all custom shaders — no surface shaders in URP',
+        'Smoothness = 1 - Roughness. URP uses Smoothness natively.',
+        'For SSS: use custom Shader Graph with subsurface approximation (no built-in SSS)',
+        'Max 8 lights per object (forward rendering). Use additional lights sparingly.',
+        'Use _CameraOpaqueTexture for screen-space refraction'
+      ]
+    },
+    hdrp: {
+      name: 'High Definition Render Pipeline (HDRP)',
+      shader: 'HDRP/Lit',
+      maskMap: true,
+      diffuse: 'PNG → BC7',
+      normal: 'PNG → BC5 (Linear)',
+      mask: 'PNG → BC7 (Mask Map: MADS)',
+      sss: true,
+      decals: 'HDRP Decal Projector',
+      postProcess: 'Volume Framework (HDRP)',
+      notes: 'HDRP Mask Map: R=Metallic, G=AO, B=Detail Mask, A=Smoothness. Best for PC/Console.',
+      shaderTips: [
+        'Mask Map is mandatory for proper HDRP materials — pack MADS channels',
+        'Use Diffusion Profiles for SSS (skin, wax, foliage)',
+        'HDRP supports Stacklit for complex materials (coat + base)',
+        'Use Decal Projector (not mesh decals) for proper sorting',
+        'HDRP/Lit supports detail maps natively — use for surface micro-detail'
+      ]
+    },
+    builtin: {
+      name: 'Built-in Render Pipeline (Legacy)',
+      shader: 'Standard',
+      maskMap: false,
+      diffuse: 'PNG → DXT5/BC7',
+      normal: 'PNG → DXT5n (DirectX Normal)',
+      mask: 'PNG → DXT5',
+      sss: false,
+      decals: 'Projector component',
+      postProcess: 'Post Processing Stack v2',
+      notes: 'Legacy Standard shader. No SRP Batcher. Being deprecated — migrate to URP or HDRP.',
+      shaderTips: [
+        'Standard shader uses Metallic workflow by default',
+        'Surface Shaders still work but are NOT forward-compatible with SRP',
+        'OnRenderImage() will NOT work in URP/HDRP — migrate to ScriptableRenderPass',
+        'No Shader Graph support — custom shaders must be hand-written CG/HLSL',
+        'Consider this pipeline end-of-life for new projects'
+      ]
+    }
+  },
+
+  // Unity 2026 Pipeline Strategy Warnings
+  pipelineWarnings: {
+    urp: { level: 'info', icon: '✅', msg: 'URP is Unity\'s primary pipeline for 2026+. Getting physical light units, real-time GI, screen-space reflections, and on-tile mobile post-processing. Best choice for new projects.' },
+    hdrp: { level: 'warn', icon: '⚠️', msg: 'HDRP is entering maintenance mode (Unity 2026 announcement). No new features — only stability fixes and regression patches. Switch 2 support (Unity 6.5) is the only addition. Consider URP for new projects or plan your migration.' },
+    builtin: { level: 'error', icon: '🔴', msg: 'Built-in Render Pipeline is officially deprecated starting Unity 6.5. Available through Unity 6.7 LTS with enterprise support through 2029. Migrate to URP immediately for any active project.' }
+  },
+
+  // Built-in → URP/HDRP Migration Checklist
+  migrationChecklist: {
+    // HDRP → URP migration (NEW in v1.2 — HDRP maintenance mode)
+    hdrp_to_urp: [
+      { task: 'Audit all HDRP-exclusive features in use (Diffusion Profiles, Stacklit, Area Lights, Decal Projectors)', priority: 'FIRST' },
+      { task: 'Create URP Asset and Renderer — set as active pipeline in test branch', priority: 'FIRST' },
+      { task: 'Convert Mask Map (MADS) textures: extract Metallic + Smoothness for URP workflow', priority: 'HIGH' },
+      { task: 'Replace HDRP/Lit materials with Universal Render Pipeline/Lit', priority: 'HIGH' },
+      { task: 'Smoothness (HDRP Mask Map Alpha) → pack into Metallic texture Alpha channel (URP)', priority: 'HIGH' },
+      { task: 'Replace SSS Diffusion Profiles with custom Shader Graph subsurface approximation', priority: 'HIGH' },
+      { task: 'Migrate HDRP Volume overrides to URP Volume equivalents', priority: 'MEDIUM' },
+      { task: 'Replace HDRP Decal Projector with URP Decal Renderer Feature', priority: 'MEDIUM' },
+      { task: 'Convert Area Lights to Point/Spot equivalents (URP has no area lights)', priority: 'MEDIUM' },
+      { task: 'Replace Exposure Volume control with manual or auto-exposure in URP', priority: 'MEDIUM' },
+      { task: 'Port custom HDRP Shader Graph shaders — change active targets to URP', priority: 'HIGH' },
+      { task: 'Re-profile performance — URP forward rendering vs HDRP deferred', priority: 'HIGH' },
+      { task: 'Test on target platforms (URP supports mobile/Switch — HDRP did not)', priority: 'HIGH' },
+      { task: 'Remove HDRP package from Package Manager after full migration', priority: 'LOW' }
+    ],
+    urp: [
+      { task: 'Install URP package via Package Manager', priority: 'FIRST' },
+      { task: 'Create URP Asset (UniversalRenderPipelineAsset) and assign in Project Settings → Graphics', priority: 'FIRST' },
+      { task: 'Run Edit → Rendering → Materials → Convert Built-in to URP', priority: 'HIGH' },
+      { task: 'Replace Standard shader references with Universal Render Pipeline/Lit', priority: 'HIGH' },
+      { task: 'Convert _Glossiness (Smoothness) to Alpha channel of Metallic texture', priority: 'HIGH' },
+      { task: 'Re-import normal maps — verify tangent space (OpenGL vs DirectX)', priority: 'HIGH' },
+      { task: 'Replace custom Surface Shaders with Shader Graph equivalents', priority: 'HIGH' },
+      { task: 'Replace custom unlit shaders with URP/Unlit or Shader Graph', priority: 'MEDIUM' },
+      { task: 'Migrate OnRenderImage() effects to ScriptableRenderPass / Render Features', priority: 'MEDIUM' },
+      { task: 'Replace Post Processing Stack v2 with URP Volume framework', priority: 'MEDIUM' },
+      { task: 'Replace Projector components with URP Decal Renderer Feature', priority: 'LOW' },
+      { task: 'Test on target platforms (mobile ASTC, WebGL ETC2 compression)', priority: 'HIGH' },
+      { task: 'Verify SRP Batcher compatibility — check shader variants in Frame Debugger', priority: 'MEDIUM' },
+      { task: 'Remove Graphics.Blit() calls — use Blitter API in URP 14+', priority: 'LOW' }
+    ],
+    hdrp: [
+      { task: 'Install HDRP package via Package Manager', priority: 'FIRST' },
+      { task: 'Create HDRP Asset and assign in Project Settings → Graphics', priority: 'FIRST' },
+      { task: 'Run Edit → Rendering → Materials → Convert Built-in to HDRP', priority: 'HIGH' },
+      { task: 'Create Mask Map textures: R=Metallic, G=AO, B=Detail, A=Smoothness', priority: 'HIGH' },
+      { task: 'Re-author all materials with HDRP/Lit — Standard shader not supported', priority: 'HIGH' },
+      { task: 'Set up Diffusion Profiles for SSS materials (skin, foliage, wax)', priority: 'MEDIUM' },
+      { task: 'Replace Surface Shaders with Shader Graph (HDRP target)', priority: 'HIGH' },
+      { task: 'Migrate post-processing to HDRP Volume framework', priority: 'MEDIUM' },
+      { task: 'Configure HDRP Global Settings — shadow resolution, reflection probes', priority: 'MEDIUM' },
+      { task: 'Set up Exposure volume — HDRP requires explicit exposure control', priority: 'HIGH' },
+      { task: 'Replace legacy light components with HDRP-compatible versions', priority: 'HIGH' },
+      { task: 'Test performance — HDRP is PC/Console only, NOT suitable for mobile', priority: 'HIGH' }
+    ]
+  },
+
+  // Channel Packing configs per engine
+  channelPacking: {
+    unreal: [
+      { name: 'ORM (Standard UE5)', r: 'AO', g: 'Roughness', b: 'Metallic', a: 'N/A', notes: 'Default UE5 packing. Import as Linear, no sRGB.' },
+      { name: 'Mask (Custom)', r: 'Roughness', g: 'Metallic', b: 'AO', a: 'Emissive Mask', notes: 'Alternative packing. Wire manually in Material Graph.' },
+      { name: 'MRAS', r: 'Metallic', g: 'Roughness', b: 'AO', a: 'Specular', notes: 'Used by some Marketplace assets. Check import settings.' }
+    ],
+    unity: [
+      { name: 'Metallic Workflow', r: 'Metallic', g: 'AO', b: 'Detail Mask', a: 'Smoothness', notes: 'Unity Standard Shader default. Smoothness = 1 - Roughness.' },
+      { name: 'HDRP Mask Map', r: 'Metallic', g: 'AO', b: 'Detail Mask', a: 'Smoothness', notes: 'Same layout for HDRP. Mark as Linear in import settings.' },
+      { name: 'URP Simple', r: 'Metallic', g: 'N/A', b: 'N/A', a: 'Smoothness', notes: 'Minimal packing for mobile URP.' }
+    ],
+    godot: [
+      { name: 'ORM Texture', r: 'AO', g: 'Roughness', b: 'Metallic', a: 'N/A', notes: 'Same as UE5 ORM. Set as Linear in import dock.' },
+      { name: 'Separate Maps', r: 'N/A', g: 'N/A', b: 'N/A', a: 'N/A', notes: 'Godot also supports individual roughness/metallic textures.' }
+    ],
+    custom: [
+      { name: 'Standard ORM', r: 'AO', g: 'Roughness', b: 'Metallic', a: 'Height/Mask', notes: 'Most common convention. Document your packing in the project wiki.' }
+    ]
+  },
+
+  // Material Recipes — common material setups
+  materialRecipes: {
+    unreal: [
+      { name: 'Terrain / Landscape Blend',
+        desc: 'Runtime Virtual Texturing + landscape layers for open world terrain.',
+        setup: 'Material Domain: Surface | Blend Mode: Opaque | Shading: Default Lit\n\nNodes:\n1. Landscape Layer Blend (4 layers: Grass, Dirt, Rock, Sand)\n2. Each layer: BaseColor + Normal + ORM packed texture\n3. Enable "Use Material Attributes" for clean graph\n4. Macro Variation: World-space noise to break tiling (0.001 scale)\n5. RVT Output for runtime blending\n\nPerf tip: Max 4 layers per component. Use weight-map painting.' },
+      { name: 'Character Skin (SSS)',
+        desc: 'Subsurface scattering for realistic character skin.',
+        setup: 'Shading Model: Subsurface Profile\n\nNodes:\n1. BaseColor: Skin albedo (no baked lighting!)\n2. Normal: High-detail skin pores (BC5, DirectX)\n3. Roughness: 0.35-0.55 base, lower on oily zones (nose, forehead)\n4. Subsurface Profile: Burley preset, tweak Mean Free Path\n5. Opacity: Thickness map for ears/fingers (thin = more SSS)\n\nTA Warning: SSS is expensive. Use on hero characters only. NPCs get Default Lit with fake SSS via fresnel.' },
+      { name: 'Modular Environment (Trim Sheet)',
+        desc: 'Single material for entire modular building kit.',
+        setup: 'Technique: Trim Sheet + Tiling Materials\n\n1. Trim Sheet texture (2048x4096 non-square OK)\n   - Top half: trims (edges, moldings, panels)\n   - Bottom half: tileable surfaces\n2. UV Channel 0: Trim sheet mapping\n3. UV Channel 1: Tiling overlay (brick, concrete)\n4. Vertex Color R: Blend between trim and tiling\n5. Material Instance: Expose tint, roughness offset, tiling scale\n\nPro tip: One trim sheet material can dress an entire building. UV in Blender/Maya with trim template overlay.' },
+      { name: 'Glass / Translucent',
+        desc: 'Transparent glass with refraction and tint.',
+        setup: 'Blend Mode: Translucent | Lighting: Surface ForwardShading\n\n1. BaseColor: White or slight tint\n2. Metallic: 0 | Roughness: 0.0 (clean) to 0.3 (frosted)\n3. Opacity: 0.05-0.3 (lower = more transparent)\n4. Refraction: 1.5 (glass IOR)\n5. Specular: 0.5 (default)\n\nPerf: Translucent is expensive. Use Masked + dithering for distant glass.' }
+    ],
+    unity: [
+      { name: 'Terrain / Terrain Layers',
+        desc: 'Built-in terrain system with texture splatting.',
+        setup: 'Terrain Settings: Max 8 layers, 4 per pass\n\n1. Create Terrain Layers (ScriptableObject)\n2. Each layer: Diffuse + Normal + Mask Map (M/AO/Detail/Smoothness)\n3. Set tiling size per layer (Grass: 5m, Rock: 15m, etc.)\n4. Instanced Drawing: Enable GPU Instancing on terrain material\n5. Detail objects: Use grass shader with cross-billboard LOD\n\nHDRP: Use Terrain Lit shader. URP: Use Universal Terrain shader.' },
+      { name: 'Character Skin (SSS)',
+        desc: 'HDRP Subsurface Scattering for skin.',
+        setup: 'Shader: HDRP/Lit | Material Type: Subsurface Scattering\n\n1. Diffusion Profile: Create SSS profile asset\n2. Subsurface Mask: Thickness/transmittance map\n3. BaseColor: Skin albedo (no AO baked in)\n4. Smoothness: 0.45-0.65 (= 1 - Roughness)\n5. Normal: Detail normal for pores (scale 0.5-1.0)\n\nURP: SSS not natively supported. Fake with custom shader + fresnel rim.' },
+      { name: 'Toon / Cel-Shaded',
+        desc: 'Stylized toon shading with outlines.',
+        setup: 'URP Custom Shader or Shader Graph:\n\n1. Main Light: Ramp texture lookup (2-3 color bands)\n2. Rim Light: Fresnel-based edge highlight\n3. Outline: Inverted hull method (vertex extrusion in second pass)\n4. Specular: Hard step function for anime-style highlight\n5. Shadow: Flat color multiply (no smooth falloff)\n\nTip: Use Shader Graph "Custom Function" node for ramp sampling.' }
+    ],
+    godot: [
+      { name: 'Basic PBR',
+        desc: 'Standard Godot 4 PBR material setup.',
+        setup: 'Node: StandardMaterial3D or ShaderMaterial\n\n1. Albedo: Color + Texture\n2. Metallic: 0.0 or 1.0 (binary for most materials)\n3. Roughness: Texture or single value\n4. Normal Map: Enable "Normal Map" checkbox, adjust depth\n5. AO: Enable "Ambient Occlusion", set to ORM texture\n\nGodot-specific: ORM texture supported natively. Set import as Linear.' },
+      { name: 'Stylized (Toon)',
+        desc: 'Custom toon shader in Godot.',
+        setup: 'ShaderMaterial with custom .gdshader:\n\n1. Light function: step() for hard shadow edge\n2. Ramp texture: 1D gradient for light bands\n3. Outline: Separate mesh with inverted normals + cull_front\n4. Rim: smoothstep on dot(VIEW, NORMAL)\n\nGodot tip: Use hint_albedo for sRGB textures, hint_normal for normals.' }
+    ],
+    custom: [
+      { name: 'Generic PBR',
+        desc: 'Standard metallic-roughness PBR workflow.',
+        setup: 'Follow glTF 2.0 PBR standard:\n\n1. BaseColor (sRGB)\n2. Normal (Linear, OpenGL or DirectX — document which)\n3. MetallicRoughness: G=Roughness, B=Metallic (glTF standard)\n4. AO: Separate or packed\n5. Emissive: HDR values allowed\n\nExport as glTF 2.0 for maximum engine compatibility.' }
+    ]
+  }
+};
+
+let specData = {};
+
+function updatePipelineWarning() {
+  const rp = document.getElementById('renderPipeline').value;
+  const warn = SPECS.pipelineWarnings[rp];
+  const el = document.getElementById('pipelineWarning');
+  const hdrpLabel = document.getElementById('migratingHdrpLabel');
+  if (warn) {
+    const colors = { info: { bg: '#1a2a1a', border: 'var(--green)', text: 'var(--green)' }, warn: { bg: '#3a2a1a', border: 'var(--orange)', text: 'var(--orange)' }, error: { bg: '#3a1a1a', border: 'var(--red)', text: 'var(--red)' } };
+    const c = colors[warn.level];
+    el.style.display = 'block';
+    el.style.background = c.bg;
+    el.style.border = `1px solid ${c.border}`;
+    el.style.color = c.text;
+    el.innerHTML = `<strong>${warn.icon} Unity 2026 Pipeline Update:</strong> ${warn.msg}`;
+  } else {
+    el.style.display = 'none';
+  }
+  // Show "Migrating from HDRP?" only when URP is selected
+  hdrpLabel.style.display = (rp === 'urp') ? 'inline' : 'none';
+  if (rp !== 'urp') document.getElementById('migratingHdrp').checked = false;
+}
+
+function generateSpec() {
+  const p = document.getElementById('platform').value;
+  const e = document.getElementById('engine').value;
+  const style = document.getElementById('artStyle').value;
+  const genre = document.getElementById('genre').value;
+  const poly = document.getElementById('polyBudget').value;
+  const team = document.getElementById('teamSize').value;
+  const title = document.getElementById('gameTitle').value || 'Untitled Project';
+  const notes = document.getElementById('notes').value;
+
+  const tex = SPECS.textureSizes[p];
+  const fmt = SPECS.formats[e];
+  const nm = SPECS.naming[e];
+  const maps = SPECS.maps[style];
+  const lods = SPECS.lods[p];
+  const charPoly = SPECS.polyBudgets[p][poly];
+
+  const drawCallBudget = { mobile: '100-200', switch: '200-400', pc: '500-2000', console: '1000-3000', vr: '100-200', web: '100-300' }[p];
+  const memBudget = { mobile: '1-2 GB', switch: '2-3 GB', pc: '4-8 GB', console: '8-12 GB', vr: '2-4 GB', web: '512 MB - 1 GB' }[p];
+  const fps = { mobile: 30, switch: 30, pc: 60, console: 60, vr: 72, web: 60 }[p];
+
+  const useChannelPack = (style === 'realistic' || style === 'stylized');
+  const useNanite = (p === 'console' && poly === 'ultra' && e === 'unreal');
+
+  const rp = (e === 'unity') ? document.getElementById('renderPipeline').value : null;
+  const isMigrating = (e === 'unity') ? document.getElementById('migrating').checked : false;
+  const isMigratingHdrp = (e === 'unity' && rp === 'urp') ? document.getElementById('migratingHdrp').checked : false;
+  const rpData = rp ? SPECS.unityRP[rp] : null;
+
+  // Override Unity formats based on render pipeline
+  if (rpData) {
+    fmt.diffuse = rpData.diffuse;
+    fmt.normal = rpData.normal;
+    fmt.mask = rpData.mask;
+  }
+
+  specData = { title, platform: p, engine: e, style, genre, poly, team, tex, fmt, maps, lods, charPoly, drawCallBudget, memBudget, fps, nm, useChannelPack, useNanite, notes, rp, rpData, isMigrating, isMigratingHdrp };
+
+  let html = '';
+
+  // 1. Overview
+  html += `<div class="spec-card"><h3>📋 Project Overview</h3>
+  <table><tr><th>Property</th><th>Value</th></tr>
+  <tr><td>Project</td><td><strong>${title}</strong></td></tr>
+  <tr><td>Platform</td><td>${p.toUpperCase()}</td></tr>
+  <tr><td>Engine</td><td>${e.charAt(0).toUpperCase()+e.slice(1)}</td></tr>
+  <tr><td>Art Style</td><td>${style.charAt(0).toUpperCase()+style.slice(1)}</td></tr>
+  <tr><td>Genre</td><td>${genre.toUpperCase()}</td></tr>
+  <tr><td>Target FPS</td><td>${fps} fps</td></tr>
+  <tr><td>Memory Budget (Textures)</td><td>${memBudget}</td></tr>
+  <tr><td>Draw Call Budget</td><td>${drawCallBudget}</td></tr>
+  </table></div>`;
+
+  // 2. Texture Spec
+  html += `<div class="spec-card"><h3>🖼️ Texture Specifications</h3>
+  <table><tr><th>Asset Type</th><th>Max Resolution</th><th>Format</th></tr>
+  <tr><td>Character</td><td>${tex.char}×${tex.char}</td><td>${fmt.diffuse}</td></tr>
+  <tr><td>Props</td><td>${tex.prop}×${tex.prop}</td><td>${fmt.diffuse}</td></tr>
+  <tr><td>Environment</td><td>${tex.env}×${tex.env}</td><td>${fmt.diffuse}</td></tr>
+  <tr><td>UI Elements</td><td>${tex.ui}×${tex.ui}</td><td>${fmt.ui}</td></tr>
+  <tr><td>Texture Atlas</td><td>${tex.atlas}×${tex.atlas}</td><td>${fmt.diffuse}</td></tr>
+  <tr><td>Normal Maps</td><td>Same as above</td><td>${fmt.normal}</td></tr>
+  ${useChannelPack ? `<tr><td>Mask/Packed</td><td>Same as above</td><td>${fmt.mask}</td></tr>` : ''}
+  </table>
+  <div class="note">💡 All textures must be power-of-2. Non-square (e.g., 2048×1024) allowed for environment trim sheets.</div>
+  </div>`;
+
+  // 3. Required Maps
+  html += `<div class="spec-card"><h3>🗺️ Required Texture Maps (${style})</h3>
+  <ul class="checklist">${maps.map(m => `<li>${m}</li>`).join('')}</ul>
+  ${useChannelPack ? '<div class="note">💡 Channel pack Roughness/Metallic/AO into a single RGB mask texture to save memory and draw calls.</div>' : ''}
+  </div>`;
+
+  // 4. Polygon Budget
+  html += `<div class="spec-card"><h3>📐 Polygon Budget</h3>
+  <table><tr><th>Asset Type</th><th>Max Triangles</th><th>Priority</th></tr>
+  <tr><td>Player Character</td><td>${charPoly}</td><td><span class="tag tag-red">STRICT</span></td></tr>
+  <tr><td>NPCs (Main)</td><td>${charPoly}</td><td><span class="tag tag-orange">TARGET</span></td></tr>
+  <tr><td>NPCs (Background)</td><td>50% of above</td><td><span class="tag tag-green">FLEXIBLE</span></td></tr>
+  <tr><td>Hero Props</td><td>${tex.prop === '512' ? '1K' : '5K'}</td><td><span class="tag tag-orange">TARGET</span></td></tr>
+  <tr><td>Fill Props</td><td>${tex.prop === '512' ? '200' : '1K'}</td><td><span class="tag tag-green">FLEXIBLE</span></td></tr>
+  </table>
+  ${useNanite ? '<div class="note">🔥 Nanite enabled — virtualized geometry. Poly budget is a guideline for source meshes; Nanite handles LOD automatically.</div>' : ''}
+  </div>`;
+
+  // 5. LOD
+  if (!useNanite) {
+    html += `<div class="spec-card"><h3>📉 LOD Chain</h3>
+    <table><tr><th>LOD Level</th><th>% of LOD0</th><th>Distance</th></tr>
+    ${lods.map((pct, i) => `<tr><td>LOD${i}</td><td>${pct}%</td><td>${i === 0 ? '0-10m' : i === 1 ? '10-25m' : i === 2 ? '25-50m' : '50m+'}</td></tr>`).join('')}
+    </table>
+    <div class="note">💡 Generate LODs automatically in-engine, then manually clean up LOD1. Lower LODs can be auto-generated.</div>
+    </div>`;
+  }
+
+  // 6. Naming Convention
+  html += `<div class="spec-card"><h3>📁 Naming Convention (${e})</h3>
+  <table><tr><th>Type</th><th>Prefix</th><th>Example</th></tr>
+  <tr><td>Texture</td><td>${nm.prefix}</td><td><span class="naming-example">${nm.prefix}${title.replace(/\s/g,'')}_Character_D</span></td></tr>
+  <tr><td>Material</td><td>${nm.mat}</td><td><span class="naming-example">${nm.mat}${title.replace(/\s/g,'')}_Character</span></td></tr>
+  <tr><td>Static Mesh</td><td>${nm.mesh}</td><td><span class="naming-example">${nm.mesh}Rock_Large_01</span></td></tr>
+  <tr><td>Skeletal Mesh</td><td>${nm.skel}</td><td><span class="naming-example">${nm.skel}Player</span></td></tr>
+  <tr><td>Animation</td><td>${nm.anim}</td><td><span class="naming-example">${nm.anim}Player_Run</span></td></tr>
+  </table>
+  <div class="note">
+  <strong>Texture Suffixes:</strong> _D (Diffuse/BaseColor), _N (Normal), _R (Roughness), _M (Metallic), _AO (Ambient Occlusion), _E (Emissive), _MSK (Mask/Packed)
+  </div>
+  </div>`;
+
+  // 7. Folder Structure
+  const folders = e === 'unreal' ?
+    `Content/
+├── Characters/
+│   ├── Player/
+│   │   ├── Meshes/
+│   │   ├── Textures/
+│   │   ├── Materials/
+│   │   └── Animations/
+│   └── NPCs/
+├── Environment/
+│   ├── Props/
+│   ├── Modular/
+│   ├── Foliage/
+│   └── Textures/
+├── UI/
+├── Effects/
+└── Audio/` :
+    `Assets/
+├── Art/
+│   ├── Characters/
+│   │   ├── Player/
+│   │   └── NPCs/
+│   ├── Environment/
+│   │   ├── Props/
+│   │   ├── Modular/
+│   │   └── Foliage/
+│   ├── UI/
+│   └── Effects/
+├── Materials/
+├── Animations/
+└── Audio/`;
+
+  html += `<div class="spec-card"><h3>📂 Folder Structure</h3><pre>${folders}</pre></div>`;
+
+  // 8. Performance Checklist
+  const checks = [
+    `All textures are power-of-2 (max ${tex.char} for characters)`,
+    `Normal maps set to Linear color space (not sRGB)`,
+    `${useChannelPack ? 'Channel-packed masks (R:Rough G:Metal B:AO)' : 'Separate maps optimized per platform'}`,
+    `LOD chain: ${lods.length} levels per mesh asset`,
+    `Draw calls under ${drawCallBudget} per frame`,
+    `Texture memory under ${memBudget}`,
+    `No duplicate materials — use Material Instances`,
+    `UV2 for lightmaps (no overlapping UVs)`,
+    `Collision meshes simplified (10-20% of render mesh)`,
+    `Naming convention enforced before commit`
+  ];
+
+  html += `<div class="spec-card"><h3>✅ Pre-Production Checklist</h3>
+  <ul class="checklist">${checks.map(c => `<li>${c}</li>`).join('')}</ul></div>`;
+
+  // 9. PBR Material Reference Values
+  if (style === 'realistic' || style === 'stylized') {
+    const pbrData = SPECS.pbrRef;
+    html += `<div class="spec-card"><h3>🎨 PBR Material Reference Values</h3>
+    <div class="note">These are physically-accurate PBR ranges measured from AAA productions. The #1 TA mistake: metallic values between 0 and 1. Metals are always M=1, everything else M=0.</div>
+    <table><tr><th>Material</th><th>BaseColor</th><th>Metallic</th><th>Roughness</th><th>TA Notes</th></tr>
+    ${pbrData.map(m => `<tr>
+      <td><strong>${m.name}</strong></td>
+      <td>${m.basecolor !== 'Varies' ? `<span class="pbr-swatch" style="background:${m.basecolor}"></span>` : ''}${m.basecolor}</td>
+      <td><span class="tag ${m.metallic === '1.0' ? 'tag-green' : 'tag-orange'}">${m.metallic}</span></td>
+      <td>${m.roughness}</td>
+      <td style="font-size:0.8rem;color:var(--muted)">${m.notes}</td>
+    </tr>`).join('')}
+    </table>
+    <div class="note">💡 <strong>The Binary Metal Rule:</strong> In PBR, metallic is almost always 0 or 1. The only exception is rust/oxidation transitions where you blend via a mask — never set metallic to 0.5 on the material itself.</div>
+    </div>`;
+  }
+
+  // 10. Channel Packing Guide
+  if (useChannelPack) {
+    const packs = SPECS.channelPacking[e] || SPECS.channelPacking.custom;
+    html += `<div class="spec-card"><h3>📦 Channel Packing Guide (${e})</h3>
+    <p style="color:var(--muted);margin-bottom:12px">Channel packing saves 60-75% texture memory by combining grayscale maps into RGB(A) channels of a single texture.</p>
+    ${packs.map(pk => `
+      <div style="margin-bottom:16px">
+        <strong style="color:var(--accent)">${pk.name}</strong>
+        <div class="channel-grid">
+          <div class="channel-box ch-r">R: ${pk.r}</div>
+          <div class="channel-box ch-g">G: ${pk.g}</div>
+          <div class="channel-box ch-b">B: ${pk.b}</div>
+          <div class="channel-box ch-a">A: ${pk.a}</div>
+        </div>
+        <div style="font-size:0.8rem;color:var(--muted)">${pk.notes}</div>
+      </div>
+    `).join('')}
+    <div class="note">⚠️ <strong>Import as Linear</strong> — packed maps are data textures, not color. sRGB gamma will corrupt roughness/metallic values.</div>
+    </div>`;
+  }
+
+  // 11. Material Recipes (engine-specific)
+  const recipes = SPECS.materialRecipes[e] || SPECS.materialRecipes.custom;
+  html += `<div class="spec-card"><h3>🧪 Material Recipes (${e})</h3>
+  <p style="color:var(--muted);margin-bottom:12px">Copy-paste ready material setups for common scenarios. Click to expand.</p>
+  ${recipes.map((r, i) => `
+    <div class="recipe-toggle" onclick="this.nextElementSibling.classList.toggle('open')">
+      <span><strong>${r.name}</strong> <span style="color:var(--muted);font-size:0.85rem">— ${r.desc}</span></span>
+      <span style="color:var(--accent)">▼</span>
+    </div>
+    <div class="recipe-body"><pre>${r.setup}</pre></div>
+  `).join('')}
+  </div>`;
+
+  // 12. AI Pipeline Tips (TA knowledge)
+  html += `<div class="spec-card"><h3>🤖 AI-Assisted Pipeline Tips</h3>
+  <table><tr><th>Task</th><th>Recommended Tool</th><th>TA Notes</th></tr>
+  <tr><td>Concept Art</td><td>Midjourney / SDXL</td><td>Use as reference only. Establish style guide first, then use img2img for consistency.</td></tr>
+  <tr><td>PBR Textures</td><td>Stable Diffusion + ControlNet</td><td>Generate basecolor → derive roughness/metallic manually or with Substance. AI normals are unreliable.</td></tr>
+  <tr><td>PBR Map Extraction</td><td>CHORD (Ubisoft) / GenPBR</td><td>Single image → full PBR set. Good for prototyping, not final. Always validate roughness/metallic ranges.</td></tr>
+  <tr><td>Seamless Tiling</td><td>ComfyUI (Tiling nodes)</td><td>Always verify tile with 3×3 grid preview. Fix seams in Photoshop/Krita.</td></tr>
+  <tr><td>UV-aware Texturing</td><td>TEXTurePaper / Meshy</td><td>Best for props. Characters need manual UV + hand-correction for style consistency.</td></tr>
+  <tr><td>Upscaling</td><td>Real-ESRGAN / Topaz</td><td>Upscale AI output to 2× then downscale to target res. Better quality than generating at target res.</td></tr>
+  <tr><td>Icon Generation</td><td>SDXL + LoRA</td><td>Train a LoRA on 20-30 hand-made icons for style lock. Batch generate, then hand-pick + clean.</td></tr>
+  <tr><td>Background Removal</td><td>SAM / Rembg</td><td>Use for icon/UI asset extraction. Always check edges at 200% zoom.</td></tr>
+  </table>
+  <div class="note">⚠️ AI-generated assets need TA review. Common issues: incorrect normal direction, non-PBR values, broken tiling, inconsistent style. Use AI for acceleration, not replacement.</div>
+  </div>`;
+
+  // 13. Unity Render Pipeline Setup (if Unity selected)
+  if (rpData) {
+    html += `<div class="spec-card"><h3>⚙️ Unity Render Pipeline: ${rpData.name}</h3>
+    <table><tr><th>Property</th><th>Value</th></tr>
+    <tr><td>Default Shader</td><td><span class="naming-example">${rpData.shader}</span></td></tr>
+    <tr><td>Mask Map</td><td>${rpData.maskMap ? '<span class="tag tag-green">Required (MADS)</span>' : '<span class="tag tag-orange">Not used</span>'}</td></tr>
+    <tr><td>SSS Support</td><td>${rpData.sss ? '<span class="tag tag-green">Native (Diffusion Profiles)</span>' : '<span class="tag tag-orange">Custom Shader Graph only</span>'}</td></tr>
+    <tr><td>Decal System</td><td>${rpData.decals}</td></tr>
+    <tr><td>Post-Processing</td><td>${rpData.postProcess}</td></tr>
+    </table>
+    <div class="note">${rpData.notes}</div>
+    <div style="margin-top:12px"><strong style="color:var(--accent)">TA Tips for ${rpData.name}:</strong>
+    <ul style="margin-top:6px;padding-left:20px;color:var(--muted);font-size:0.9rem">
+    ${rpData.shaderTips.map(t => `<li style="margin:4px 0">${t}</li>`).join('')}
+    </ul></div>
+    </div>`;
+  }
+
+  // 14. Migration Checklist (if migrating from Built-in)
+  if (isMigrating && rp && rp !== 'builtin') {
+    const checklist = SPECS.migrationChecklist[rp] || [];
+    html += `<div class="spec-card" style="border-color:var(--orange)"><h3 style="color:var(--orange)">🔄 Built-in → ${rpData.name} Migration Checklist</h3>
+    <p style="color:var(--muted);margin-bottom:12px">Step-by-step migration guide. Complete in order — FIRST priority items before HIGH.</p>
+    <table><tr><th>Task</th><th>Priority</th></tr>
+    ${checklist.map(c => `<tr><td>${c.task}</td><td><span class="tag ${c.priority==='FIRST'?'tag-red':c.priority==='HIGH'?'tag-orange':c.priority==='MEDIUM'?'tag-green':'tag-green'}">${c.priority}</span></td></tr>`).join('')}
+    </table>
+    <div class="note">⚠️ <strong>Before migrating:</strong> Create a full project backup. Unity's auto-converter handles ~60% of materials — the rest need manual re-authoring. Budget 2-5 days for a mid-size project.</div>
+    </div>`;
+  }
+
+  // 15. HDRP → URP Migration Checklist (NEW v1.2 — HDRP entering maintenance mode)
+  if (isMigratingHdrp && rp === 'urp') {
+    const checklist = SPECS.migrationChecklist.hdrp_to_urp || [];
+    html += `<div class="spec-card" style="border-color:var(--red)"><h3 style="color:var(--red)">🔄 HDRP → URP Migration Checklist (Unity 2026)</h3>
+    <p style="color:var(--muted);margin-bottom:12px"><strong>Why migrate:</strong> Unity announced HDRP is entering maintenance mode — no new features, only stability fixes. URP is now the primary pipeline getting all new features including physical light units, real-time GI, and screen-space reflections.</p>
+    <table><tr><th>Task</th><th>Priority</th></tr>
+    ${checklist.map(c => `<tr><td>${c.task}</td><td><span class="tag ${c.priority==='FIRST'?'tag-red':c.priority==='HIGH'?'tag-orange':c.priority==='MEDIUM'?'tag-green':'tag-green'}">${c.priority}</span></td></tr>`).join('')}
+    </table>
+    <div class="note">⚠️ <strong>Key difference from Built-in migration:</strong> HDRP → URP requires Mask Map (MADS) deconstruction. Extract Metallic and Smoothness channels and repack for URP's simpler workflow. Budget 3-7 days for a mid-size project with HDRP-specific features.</div>
+    </div>`;
+  }
+
+  document.getElementById('specContent').innerHTML = html;
+  document.getElementById('output').style.display = 'block';
+  document.getElementById('validatorCard').style.display = 'block';
+  document.getElementById('output').scrollIntoView({ behavior: 'smooth' });
+}
+
+function validateFilename() {
+  const input = document.getElementById('texFilename').value.trim();
+  if (!input) return;
+  const results = [];
+  const stem = input.replace(/\.[^.]+$/, '');
+  const ext = input.includes('.') ? input.split('.').pop().toLowerCase() : '';
+  const nm = specData.nm;
+
+  // Check extension
+  const validExts = ['png','tga','jpg','jpeg','exr','hdr','dds','webp','bmp'];
+  if (!ext) {
+    results.push({ type: 'fail', msg: 'No file extension. Add .png, .tga, etc.' });
+  } else if (!validExts.includes(ext)) {
+    results.push({ type: 'warn', msg: `Unusual extension ".${ext}". Common: .png, .tga, .exr` });
+  } else {
+    results.push({ type: 'pass', msg: `Extension ".${ext}" is valid.` });
+  }
+
+  // Check prefix
+  const prefixes = [nm.prefix, nm.mat, nm.mesh, nm.skel, nm.anim];
+  const hasPrefix = prefixes.some(p => stem.startsWith(p) || stem.toLowerCase().startsWith(p.toLowerCase()));
+  if (hasPrefix) {
+    results.push({ type: 'pass', msg: `Has valid prefix for ${specData.engine}.` });
+  } else {
+    results.push({ type: 'fail', msg: `Missing prefix. Expected: ${prefixes.join(', ')}` });
+  }
+
+  // Check spaces
+  if (/\s/.test(input)) {
+    results.push({ type: 'fail', msg: 'Filename contains spaces. Use underscores instead.' });
+  } else {
+    results.push({ type: 'pass', msg: 'No spaces.' });
+  }
+
+  // Check special chars
+  if (/[^a-zA-Z0-9_\-.]/.test(input)) {
+    results.push({ type: 'fail', msg: 'Special characters detected. Use only A-Z, 0-9, underscore, hyphen.' });
+  } else {
+    results.push({ type: 'pass', msg: 'No special characters.' });
+  }
+
+  // Check suffix
+  const suffixes = ['_D','_N','_R','_M','_AO','_E','_MSK','_H','_O','_ORM','_MRAS'];
+  const hasSuffix = suffixes.some(s => stem.toUpperCase().endsWith(s));
+  if (hasSuffix) {
+    results.push({ type: 'pass', msg: 'Has map type suffix.' });
+  } else {
+    results.push({ type: 'warn', msg: `No map suffix found. Recommended: ${suffixes.join(', ')}` });
+  }
+
+  // Check version number
+  if (/_\d{2}(_[A-Z]+)?$/.test(stem)) {
+    results.push({ type: 'pass', msg: 'Has version number.' });
+  } else {
+    results.push({ type: 'warn', msg: 'No version suffix (e.g., _01). Recommended for iteration tracking.' });
+  }
+
+  const el = document.getElementById('validatorResults');
+  el.innerHTML = results.map(r =>
+    `<div class="validator-result validator-${r.type}">${r.type === 'pass' ? '✓' : r.type === 'fail' ? '✗' : '⚠'} ${r.msg}</div>`
+  ).join('');
+}
+
+function toMarkdown() {
+  const s = specData;
+  let md = `# ${s.title} — Technical Art Spec\n\n`;
+  md += `| Property | Value |\n|---|---|\n`;
+  md += `| Platform | ${s.platform.toUpperCase()} |\n`;
+  md += `| Engine | ${s.engine} |\n`;
+  md += `| Art Style | ${s.style} |\n`;
+  md += `| Target FPS | ${s.fps} |\n`;
+  md += `| Memory Budget | ${s.memBudget} |\n`;
+  md += `| Draw Calls | ${s.drawCallBudget} |\n\n`;
+
+  md += `## Texture Specs\n\n`;
+  md += `| Type | Resolution | Format |\n|---|---|---|\n`;
+  md += `| Character | ${s.tex.char}² | ${s.fmt.diffuse} |\n`;
+  md += `| Props | ${s.tex.prop}² | ${s.fmt.diffuse} |\n`;
+  md += `| Environment | ${s.tex.env}² | ${s.fmt.diffuse} |\n`;
+  md += `| Normal | same | ${s.fmt.normal} |\n\n`;
+
+  md += `## Required Maps\n\n${s.maps.map(m => `- ${m}`).join('\n')}\n\n`;
+  md += `## Polygon Budget\n\n- Player Character: ${s.charPoly} tris\n\n`;
+  md += `## Naming: ${s.nm.prefix}AssetName_Suffix\n\nSuffixes: _D (Diffuse), _N (Normal), _R (Roughness), _M (Metallic), _AO, _E (Emissive), _MSK (Mask)\n\n`;
+
+  if (s.style === 'realistic' || s.style === 'stylized') {
+    md += `## PBR Material Reference\n\n`;
+    md += `| Material | Metallic | Roughness |\n|---|---|---|\n`;
+    SPECS.pbrRef.forEach(m => {
+      md += `| ${m.name} | ${m.metallic} | ${m.roughness} |\n`;
+    });
+    md += `\n> Binary Metal Rule: Metallic is always 0 or 1. Never use values in between.\n\n`;
+  }
+
+  if (s.useChannelPack) {
+    const packs = SPECS.channelPacking[s.engine] || SPECS.channelPacking.custom;
+    md += `## Channel Packing (${s.engine})\n\n`;
+    packs.forEach(pk => {
+      md += `### ${pk.name}\n- R: ${pk.r} | G: ${pk.g} | B: ${pk.b} | A: ${pk.a}\n- ${pk.notes}\n\n`;
+    });
+  }
+
+  return md;
+}
+
+function copyMarkdown() {
+  navigator.clipboard.writeText(toMarkdown());
+  alert('Markdown copied!');
+}
+
+function copyJSON() {
+  navigator.clipboard.writeText(JSON.stringify(specData, null, 2));
+  alert('JSON copied!');
+}
+
+function toArtBible() {
+  const s = specData;
+  if (!s.title) return 'Generate a spec first.';
+  const date = new Date().toISOString().split('T')[0];
+  const engineName = {unity:'Unity',unreal:'Unreal Engine 5',godot:'Godot 4',custom:'Custom Engine'}[s.engine];
+  const platformName = {mobile:'Mobile (iOS/Android)',switch:'Nintendo Switch',pc:'PC (Steam)',console:'Console (PS5/Xbox Series X)',vr:'VR',web:'Web'}[s.platform];
+  const styleName = {realistic:'Realistic / PBR',stylized:'Stylized',pixel:'Pixel Art',lowpoly:'Low Poly',toon:'Toon / Cel-Shaded',handpainted:'Hand-Painted'}[s.style];
+
+  let md = '';
+  md += `# ${s.title} — Art Bible\n\n`;
+  md += `> Generated by [GameArtSpec](https://jessicaarchive.github.io/gameartspec/) | ${date}\n\n`;
+  md += `---\n\n`;
+
+  // 1. Project Identity
+  md += `## 1. Project Identity\n\n`;
+  md += `| Property | Value |\n|---|---|\n`;
+  md += `| **Project Name** | ${s.title} |\n`;
+  md += `| **Platform** | ${platformName} |\n`;
+  md += `| **Engine** | ${engineName} |\n`;
+  md += `| **Art Style** | ${styleName} |\n`;
+  md += `| **Genre** | ${s.genre.toUpperCase()} |\n`;
+  md += `| **Target FPS** | ${s.fps} fps |\n`;
+  md += `| **Team Size** | ${s.team} |\n\n`;
+
+  // 2. Visual Direction
+  md += `## 2. Visual Direction\n\n`;
+  md += `### Art Style: ${styleName}\n\n`;
+  if (s.style === 'realistic' || s.style === 'stylized') {
+    md += `This project follows a ${s.style} art style with physically-based rendering (PBR).\n\n`;
+    md += `**Key Visual Principles:**\n`;
+    md += `- All materials must follow PBR metallic-roughness workflow\n`;
+    md += `- Metallic values must be binary: 0 (dielectric) or 1 (metal) — no in-between\n`;
+    md += `- Albedo brightness must stay within physically accurate range (sRGB 30-240)\n`;
+    md += `- No baked lighting in diffuse/albedo textures\n\n`;
+  } else if (s.style === 'pixel') {
+    md += `This project uses pixel art. All textures must use **nearest-neighbor filtering** (no bilinear).\n\n`;
+    md += `**Key Visual Principles:**\n`;
+    md += `- Consistent pixel density across all assets\n`;
+    md += `- No sub-pixel rendering or anti-aliasing on sprite edges\n`;
+    md += `- Limited color palette per asset (recommended: 16-32 colors)\n\n`;
+  } else if (s.style === 'toon') {
+    md += `This project uses toon/cel-shaded rendering.\n\n`;
+    md += `**Key Visual Principles:**\n`;
+    md += `- Hard shadow edges (2-3 tone bands)\n`;
+    md += `- Consistent outline thickness across screen sizes\n`;
+    md += `- Flat color areas with minimal texture noise\n\n`;
+  } else if (s.style === 'lowpoly') {
+    md += `This project uses a low-poly aesthetic.\n\n`;
+    md += `**Key Visual Principles:**\n`;
+    md += `- Flat shading (no smoothing groups on stylistic meshes)\n`;
+    md += `- Minimal or no textures — vertex colors preferred\n`;
+    md += `- Geometric shapes define silhouette — no normal map detail\n\n`;
+  } else {
+    md += `This project uses a ${s.style} art style.\n\n`;
+  }
+
+  // 3. Asset Production Standards
+  md += `## 3. Asset Production Standards\n\n`;
+  md += `### 3.1 Texture Specifications\n\n`;
+  md += `| Asset Type | Max Resolution | Format |\n|---|---|---|\n`;
+  md += `| Character (Hero) | ${s.tex.char}x${s.tex.char} | ${s.fmt.diffuse} |\n`;
+  md += `| Props | ${s.tex.prop}x${s.tex.prop} | ${s.fmt.diffuse} |\n`;
+  md += `| Environment | ${s.tex.env}x${s.tex.env} | ${s.fmt.diffuse} |\n`;
+  md += `| UI Elements | ${s.tex.ui}x${s.tex.ui} | ${s.fmt.ui} |\n`;
+  md += `| Normal Maps | Same as above | ${s.fmt.normal} |\n`;
+  if (s.useChannelPack) md += `| Packed Masks | Same as above | ${s.fmt.mask} |\n`;
+  md += `\n**Rules:**\n`;
+  md += `- All textures must be power-of-two dimensions\n`;
+  md += `- Non-square allowed only for trim sheets and atlases\n`;
+  md += `- No uncompressed formats in final build\n\n`;
+
+  md += `### 3.2 Required Texture Maps (${styleName})\n\n`;
+  s.maps.forEach(m => { md += `- ${m}\n`; });
+  md += `\n`;
+
+  md += `### 3.3 Polygon Budget\n\n`;
+  md += `| Asset Type | Max Triangles | Priority |\n|---|---|---|\n`;
+  md += `| Player Character | ${s.charPoly} | STRICT |\n`;
+  md += `| Main NPCs | ${s.charPoly} | TARGET |\n`;
+  md += `| Background NPCs | 50% of above | FLEXIBLE |\n`;
+  md += `| Hero Props | ${s.tex.prop === '512' ? '1K' : '5K'} | TARGET |\n`;
+  md += `| Fill Props | ${s.tex.prop === '512' ? '200' : '1K'} | FLEXIBLE |\n\n`;
+
+  // LOD
+  if (!s.useNanite) {
+    md += `### 3.4 LOD Chain\n\n`;
+    md += `| LOD | % of LOD0 | Transition Distance |\n|---|---|---|\n`;
+    s.lods.forEach((pct, i) => {
+      const dist = i === 0 ? '0-10m' : i === 1 ? '10-25m' : i === 2 ? '25-50m' : '50m+';
+      md += `| LOD${i} | ${pct}% | ${dist} |\n`;
+    });
+    md += `\n`;
+  }
+
+  // 4. Naming Convention
+  md += `## 4. Naming Conventions (${engineName})\n\n`;
+  md += `**Format:** \`{Prefix}_{AssetName}_{MapType}_{Version}\`\n\n`;
+  md += `| Asset Type | Prefix | Example |\n|---|---|---|\n`;
+  md += `| Texture | ${s.nm.prefix} | ${s.nm.prefix}RockWall_D_01 |\n`;
+  md += `| Material | ${s.nm.mat} | ${s.nm.mat}Rock_PBR |\n`;
+  md += `| Static Mesh | ${s.nm.mesh} | ${s.nm.mesh}Rock_Large_01 |\n`;
+  md += `| Skeletal Mesh | ${s.nm.skel} | ${s.nm.skel}Player_Body |\n`;
+  md += `| Animation | ${s.nm.anim} | ${s.nm.anim}Player_Run |\n\n`;
+  md += `**Texture Map Suffixes:** _D (Diffuse), _N (Normal), _R (Roughness), _M (Metallic), _AO, _E (Emissive), _ORM (Packed), _MSK (Mask)\n\n`;
+  md += `**Rules:**\n`;
+  md += `- No spaces — use underscores\n`;
+  md += `- No special characters (!, @, #, etc.)\n`;
+  md += `- Always end with version number (_01, _02)\n\n`;
+
+  // 5. Folder Structure
+  md += `## 5. Folder Structure\n\n`;
+  const folders = s.engine === 'unreal' ?
+    `Content/\n├── Characters/\n│   ├── Player/\n│   │   ├── Meshes/\n│   │   ├── Textures/\n│   │   ├── Materials/\n│   │   └── Animations/\n│   └── NPCs/\n├── Environment/\n│   ├── Props/\n│   ├── Modular/\n│   ├── Foliage/\n│   └── Textures/\n├── UI/\n├── Effects/\n└── Audio/` :
+    `Assets/\n├── Art/\n│   ├── Characters/\n│   ├── Environment/\n│   └── UI/\n├── Materials/\n├── Animations/\n├── Prefabs/\n└── Audio/`;
+  md += '```\n' + folders + '\n```\n\n';
+  md += `- \`_Dev/[YourName]/\` for WIP — never referenced in production\n`;
+  md += `- Source files (.psd, .blend, .spp) go in source repo, NOT game repo\n\n`;
+
+  // 6. PBR Reference
+  if (s.style === 'realistic' || s.style === 'stylized') {
+    md += `## 6. PBR Material Reference\n\n`;
+    md += `| Material | BaseColor | Metallic | Roughness | Notes |\n|---|---|---|---|---|\n`;
+    SPECS.pbrRef.forEach(m => {
+      md += `| ${m.name} | ${m.basecolor} | ${m.metallic} | ${m.roughness} | ${m.notes} |\n`;
+    });
+    md += `\n> **The Binary Metal Rule:** Metallic is always 0 or 1. The only exception is rust/oxidation transitions via a mask.\n\n`;
+  }
+
+  // 7. Channel Packing
+  if (s.useChannelPack) {
+    const packs = SPECS.channelPacking[s.engine] || SPECS.channelPacking.custom;
+    md += `## 7. Channel Packing (${engineName})\n\n`;
+    packs.forEach(pk => {
+      md += `### ${pk.name}\n`;
+      md += `| R | G | B | A |\n|---|---|---|---|\n`;
+      md += `| ${pk.r} | ${pk.g} | ${pk.b} | ${pk.a} |\n\n`;
+      md += `${pk.notes}\n\n`;
+    });
+    md += `> **Import as Linear** — packed maps are data textures, not color.\n\n`;
+  }
+
+  // 8. Performance Budget
+  md += `## 8. Performance Budget\n\n`;
+  md += `| Metric | Budget |\n|---|---|\n`;
+  md += `| Target FPS | ${s.fps} fps |\n`;
+  md += `| Draw Calls | ${s.drawCallBudget} / frame |\n`;
+  md += `| Texture Memory | ${s.memBudget} |\n\n`;
+
+  // 9. Pre-Production Checklist
+  md += `## 9. Pre-Production Checklist\n\n`;
+  md += `- [ ] All textures power-of-2 (max ${s.tex.char} for characters)\n`;
+  md += `- [ ] Normal maps set to Linear color space\n`;
+  md += `- [ ] ${s.useChannelPack ? 'Channel-packed masks (R:Rough G:Metal B:AO)' : 'Texture formats match platform spec'}\n`;
+  md += `- [ ] LOD chains on all meshes > 1000 tris\n`;
+  md += `- [ ] Draw calls under ${s.drawCallBudget}\n`;
+  md += `- [ ] No duplicate materials — use Material Instances\n`;
+  md += `- [ ] Naming convention enforced (run CI validator)\n`;
+  md += `- [ ] UV2 for lightmaps (no overlap)\n`;
+  md += `- [ ] Git LFS configured for binary assets\n\n`;
+
+  // 10. AI Pipeline
+  md += `## 10. AI-Assisted Art Pipeline\n\n`;
+  md += `| Task | Tool | TA Notes |\n|---|---|---|\n`;
+  md += `| Concept Art | Midjourney / SDXL | Reference only. Establish style guide first. |\n`;
+  md += `| PBR Textures | SD + ControlNet | Generate basecolor, derive maps manually. AI normals are unreliable. |\n`;
+  md += `| Seamless Tiling | ComfyUI | Verify with 3x3 grid preview. Fix seams manually. |\n`;
+  md += `| Icon Batch | SDXL + LoRA | Train LoRA on 20-30 hand-made icons for style lock. |\n`;
+  md += `| Upscaling | Real-ESRGAN | Upscale 2x then downscale to target. Better than generating at target res. |\n\n`;
+  md += `> AI-generated assets need TA review before engine import. Common issues: incorrect normals, non-PBR values, broken tiling.\n\n`;
+
+  // Unity Render Pipeline section in Art Bible
+  if (s.rpData) {
+    md += `## Unity Render Pipeline: ${s.rpData.name}\n\n`;
+    md += `| Property | Value |\n|---|---|\n`;
+    md += `| Default Shader | \`${s.rpData.shader}\` |\n`;
+    md += `| Mask Map | ${s.rpData.maskMap ? 'Required (MADS: Metallic/AO/Detail/Smoothness)' : 'Not used'} |\n`;
+    md += `| SSS Support | ${s.rpData.sss ? 'Native (Diffusion Profiles)' : 'Custom Shader Graph only'} |\n`;
+    md += `| Post-Processing | ${s.rpData.postProcess} |\n\n`;
+    md += `**TA Tips:**\n`;
+    s.rpData.shaderTips.forEach(t => { md += `- ${t}\n`; });
+    md += `\n`;
+  }
+
+  // Migration checklist in Art Bible
+  if (s.isMigrating && s.rp && s.rp !== 'builtin') {
+    const checklist = SPECS.migrationChecklist[s.rp] || [];
+    md += `## Built-in → ${s.rpData.name} Migration Checklist\n\n`;
+    checklist.forEach(c => {
+      md += `- [ ] [${c.priority}] ${c.task}\n`;
+    });
+    md += `\n> Create a full project backup before migrating. Budget 2-5 days for a mid-size project.\n\n`;
+  }
+
+  // HDRP → URP migration checklist in Art Bible (v1.2)
+  if (s.isMigratingHdrp && s.rp === 'urp') {
+    const checklist = SPECS.migrationChecklist.hdrp_to_urp || [];
+    md += `## HDRP → URP Migration Checklist (Unity 2026)\n\n`;
+    md += `> **Context:** Unity announced HDRP is entering maintenance mode. URP is now the primary pipeline.\n\n`;
+    checklist.forEach(c => {
+      md += `- [ ] [${c.priority}] ${c.task}\n`;
+    });
+    md += `\n> HDRP → URP requires Mask Map (MADS) deconstruction. Budget 3-7 days for a mid-size project.\n\n`;
+  }
+
+  md += `---\n\n`;
+  md += `*Generated by [GameArtSpec](https://jessicaarchive.github.io/gameartspec/) — Built by a Technical Artist who shipped AAA games.*\n`;
+
+  return md;
+}
+
+function exportArtBible() {
+  if (!specData.title) { alert('Generate a spec first!'); return; }
+  const md = toArtBible();
+  navigator.clipboard.writeText(md).then(() => {
+    alert('Art Bible copied to clipboard! (Markdown format — paste into Notion, Confluence, or any markdown editor)');
+  });
+}
+
+function joinWaitlist() {
+  const email = document.getElementById('proEmail').value;
+  if (!email || !email.includes('@') || !email.includes('.')) { alert('Please enter a valid email'); return; }
+  // Save locally as backup
+  const waitlist = JSON.parse(localStorage.getItem('gas_waitlist') || '[]');
+  waitlist.push({ email, date: new Date().toISOString(), source: 'pro_banner' });
+  localStorage.setItem('gas_waitlist', JSON.stringify(waitlist));
+  // Send via FormSubmit.co (no signup needed — confirm email on first submission)
+  // TODO: Replace YOUR_EMAIL with your actual email to receive waitlist signups
+  const FORM_EMAIL = 'kyjs101211@gmail.com';
+  fetch(`https://formsubmit.co/ajax/${FORM_EMAIL}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+    body: JSON.stringify({ email, source: 'GameArtSpec Pro Waitlist', date: new Date().toISOString() })
+  }).catch(() => {}); // Silently fail — localStorage backup exists
+  document.getElementById('waitlistMsg').style.display = 'block';
+  document.getElementById('proEmail').value = '';
+}
+
+// Show/hide Render Pipeline dropdown based on engine selection
+document.getElementById('engine').addEventListener('change', function() {
+  const isUnity = this.value === 'unity';
+  document.getElementById('renderPipelineRow').style.display = isUnity ? 'block' : 'none';
+  if (isUnity) updatePipelineWarning();
+  else document.getElementById('pipelineWarning').style.display = 'none';
+});
+// Initialize on load
+if (document.getElementById('engine').value === 'unity') {
+  document.getElementById('renderPipelineRow').style.display = 'block';
+  updatePipelineWarning();
+}
+</script>
+</body>
+</html>
